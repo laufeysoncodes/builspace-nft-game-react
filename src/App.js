@@ -4,7 +4,8 @@ import SelectCharacter from "./Components/SelectCharacter";
 import { ethers } from "ethers";
 import myEpicGame from "./utils/MyEpicGame.json";
 import { CONTRACT_ADDRESS, transformCharacterData } from "./constants.js";
-import Arena from "./Components/Arena"
+import Arena from "./Components/Arena";
+import LoadingIndicator from "./Components/LoadingIndicator";
 import "./App.css";
 
 // Constants
@@ -14,6 +15,7 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const App = () => {
     const [currentAccount, setCurrentAccount] = useState(null);
     const [characterNFT, setCharacterNFT] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const checkIfWalletIsConnected = async () => {
         try {
@@ -38,9 +40,15 @@ const App = () => {
         } catch (error) {
             console.log(error);
         }
+
+        setIsLoading(false);
     };
 
     const renderContent = () => {
+        if (isLoading) {
+            return <LoadingIndicator />;
+        }
+
         if (!currentAccount) {
             return (
                 <div className="connect-wallet-container">
@@ -63,7 +71,7 @@ const App = () => {
                 ></SelectCharacter>
             );
         } else if (currentAccount && characterNFT) {
-            return <Arena characterNFT={characterNFT} />;
+            return <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT}/>;
         }
     };
 
@@ -88,20 +96,8 @@ const App = () => {
     };
 
     useEffect(() => {
+        setIsLoading(true);
         checkIfWalletIsConnected();
-
-        const checkNetwork = async () => {
-            try {
-                console.log("Network", window.ethereum.networkVersion);
-                if (window.ethereum.networkVersion !== "4") {
-                    alert("Please connect to rinkeby!");
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        // checkNetwork();
     }, []);
 
     useEffect(() => {
@@ -119,13 +115,13 @@ const App = () => {
                 signer
             );
 
-            const txn = await gameContract.checkIfUserHasNFT();
-            if (txn.name) {
-                console.log("User has character NFT");
-                setCharacterNFT(transformCharacterData(txn));
-            } else {
-                console.log("No character NFT found");
+            const characterNFT = await gameContract.checkIfUserHasNFT();
+            if (characterNFT.name) {
+                console.log("User has Character NFT");
+                setCharacterNFT(transformCharacterData(characterNFT));
             }
+
+            setIsLoading(false);
         };
 
         if (currentAccount) {
