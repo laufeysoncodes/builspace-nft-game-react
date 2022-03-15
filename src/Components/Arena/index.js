@@ -78,6 +78,7 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
         };
 
         if (gameContract) {
+            // gameContract.getPlayers().then(console.log);
             fetchBoss();
             gameContract.on("AttackComplete", onAttackComplete);
         }

@@ -59,7 +59,7 @@ const SelectCharacter = ({ setCharacterNFT }) => {
             );
 
             if (gameContract) {
-                const characterNFT = await gameContract.checkIfUserHasNFT();
+                const characterNFT = await gameContract.checkIfUserHasNFT(sender);
                 console.log("CharacterNFT: ", characterNFT);
                 setCharacterNFT(transformCharacterData(characterNFT));
             }

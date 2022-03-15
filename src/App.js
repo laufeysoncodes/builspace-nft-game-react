@@ -115,7 +115,7 @@ const App = () => {
                 signer
             );
 
-            const characterNFT = await gameContract.checkIfUserHasNFT();
+            const characterNFT = await gameContract.checkIfUserHasNFT(currentAccount);
             if (characterNFT.name) {
                 console.log("User has Character NFT");
                 setCharacterNFT(transformCharacterData(characterNFT));
