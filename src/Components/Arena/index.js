@@ -10,6 +10,7 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
     const [boss, setBoss] = useState(null);
     const [attackState, setAttackState] = useState("");
     const [showToast, setShowToast] = useState(false);
+    const [players, setPlayers] = useState([]);
 
     const runAttackAction = async () => {
         try {
@@ -57,6 +58,12 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
             setBoss(transformCharacterData(bossTxn));
         };
 
+        const fetchPlayers = async () => {
+            const players = await gameContract.getPlayers();
+            console.log("Players List:", players);
+            setPlayers(players);
+        };
+
         const onAttackComplete = (newBossHp, newPlayerHp) => {
             const bossHp = newBossHp.toNumber();
             const playerHp = newPlayerHp.toNumber();
@@ -77,10 +84,26 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
             });
         };
 
+        const onCharacterNFTMinted = async (
+            sender,
+            tokenId,
+            characterIndex
+        ) => {
+            gameContract.tokenURI(tokenId).then((newMintedCharacter) => {
+                setPlayers((prevState) => {
+                    return [
+                        ...prevState,
+                        transformCharacterData(newMintedCharacter),
+                    ];
+                });
+            });
+        };
+
         if (gameContract) {
-            // gameContract.getPlayers().then(console.log);
             fetchBoss();
+            fetchPlayers();
             gameContract.on("AttackComplete", onAttackComplete);
+            gameContract.on("CharacterNFTMinted", onCharacterNFTMinted);
         }
 
         return () => {
@@ -89,6 +112,33 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
             }
         };
     }, [gameContract, setCharacterNFT]);
+
+    const renderActivePlayerList = () => {
+        return (
+            <>
+                {players.map((characterNFT) => (
+                    <div
+                        key={characterNFT.imageURI}
+                        className="player-container"
+                    >
+                        <div className="active-player-item">
+                            <img
+                                className="player-image"
+                                src={`https://ipfs.io/ipfs/${characterNFT.imageURI.replace(
+                                    "ipfs://",
+                                    ""
+                                )}`}
+                                alt={`Character ${characterNFT.name}`}
+                            />
+                            <div className="player-content">
+                                <h4>{`⚔️ Attack Damage: ${characterNFT.attackDamage}`}</h4>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </>
+        );
+    };
 
     return (
         <div className="arena-container">
@@ -162,10 +212,12 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
                             </div>
                         </div>
                     </div>
-                    {/* <div className="active-players">
-                <h2>Active Players</h2>
-                <div className="players-list">{renderActivePlayersList()}</div>
-              </div>  */}
+                    <div className="active-players">
+                        <h2>Active Players</h2>
+                        <div className="players-list">
+                            {renderActivePlayerList()}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

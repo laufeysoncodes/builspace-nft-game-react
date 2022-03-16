@@ -108,7 +108,7 @@ const App = () => {
             );
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
+            const signer = provider.getSigner(); 
             const gameContract = new ethers.Contract(
                 CONTRACT_ADDRESS,
                 myEpicGame.abi,
