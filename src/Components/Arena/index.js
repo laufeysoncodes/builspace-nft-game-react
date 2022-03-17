@@ -59,9 +59,10 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
         };
 
         const fetchPlayers = async () => {
-            const players = await gameContract.getPlayers();
-            console.log("Players List:", players);
-            setPlayers(players);
+            let allPlayers = await gameContract.getPlayers();
+            allPlayers = allPlayers.map((item) =>  transformCharacterData(item));
+            console.log("Players List:", allPlayers);
+            setPlayers(allPlayers);
         };
 
         const onAttackComplete = (newBossHp, newPlayerHp) => {
@@ -114,9 +115,10 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
     }, [gameContract, setCharacterNFT]);
 
     const renderActivePlayerList = () => {
+        let toRender = players.filter((item) => item.name !== undefined);
         return (
             <>
-                {players.map((characterNFT) => (
+                {toRender.map((characterNFT) => (
                     <div
                         key={characterNFT.imageURI}
                         className="player-container"

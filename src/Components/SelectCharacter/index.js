@@ -34,12 +34,8 @@ const SelectCharacter = ({ setCharacterNFT }) => {
     useEffect(() => {
         const getCharacters = async () => {
             try {
-                console.log("Getting contract characters to mint");
-
                 const charactersTxn =
                     await gameContract.getAllDefaultCharacters();
-                console.log("charactersTxn:", charactersTxn);
-
                 const characters = charactersTxn.map((characterData) =>
                     transformCharacterData(characterData)
                 );
@@ -54,14 +50,11 @@ const SelectCharacter = ({ setCharacterNFT }) => {
         };
 
         const onCharacterMint = async (sender, tokenId, characterIndex) => {
-            console.log(
-                `CharacterNFTMinted - sender: ${sender} tokenId: ${tokenId.toNumber()} characterIndex: ${characterIndex.toNumber()}`
-            );
-
             if (gameContract) {
-                const characterNFT = await gameContract.checkIfUserHasNFT(sender);
-                console.log("CharacterNFT: ", characterNFT);
-                setCharacterNFT(transformCharacterData(characterNFT));
+                const characterNFT = await gameContract.checkIfUserHasNFT();
+                if (characterNFT.name) {
+                    setCharacterNFT(transformCharacterData(characterNFT));
+                }
             }
         };
 
@@ -82,12 +75,10 @@ const SelectCharacter = ({ setCharacterNFT }) => {
         try {
             if (gameContract) {
                 setMintingCharacter(true);
-                console.log("Minting character in progress...");
                 const mintTxn = await gameContract.mintCharacterNFT(
                     characterId
                 );
                 await mintTxn.wait();
-                console.log("mintTxn:", mintTxn);
                 setMintingCharacter(false);
             }
         } catch (error) {

@@ -88,7 +88,6 @@ const App = () => {
                 method: "eth_requestAccounts",
             });
 
-            console.log("Connected", accounts[0]);
             setCurrentAccount(accounts[0]);
         } catch (error) {
             console.log(error);
@@ -102,11 +101,6 @@ const App = () => {
 
     useEffect(() => {
         const fetchNFTMetadata = async () => {
-            console.log(
-                "Checking for Character NFT on address:",
-                currentAccount
-            );
-
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner(); 
             const gameContract = new ethers.Contract(
@@ -115,17 +109,15 @@ const App = () => {
                 signer
             );
 
-            const characterNFT = await gameContract.checkIfUserHasNFT(currentAccount);
+            const characterNFT = await gameContract.checkIfUserHasNFT();
             if (characterNFT.name) {
-                console.log("User has Character NFT");
-                setCharacterNFT(transformCharacterData(characterNFT));
+                setCharacterNFT(characterNFT);
             }
 
             setIsLoading(false);
         };
 
         if (currentAccount) {
-            console.log("Current Account:", currentAccount);
             fetchNFTMetadata();
         }
     }, [currentAccount]);
