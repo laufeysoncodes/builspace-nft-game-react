@@ -3,7 +3,7 @@ import twitterLogo from "./assets/twitter-logo.svg";
 import SelectCharacter from "./Components/SelectCharacter";
 import { ethers } from "ethers";
 import myEpicGame from "./utils/MyEpicGame.json";
-import { CONTRACT_ADDRESS, transformCharacterData } from "./constants.js";
+import { CONTRACT_ADDRESS } from "./constants.js";
 import Arena from "./Components/Arena";
 import LoadingIndicator from "./Components/LoadingIndicator";
 import "./App.css";
@@ -20,7 +20,7 @@ const App = () => {
     const checkIfWalletIsConnected = async () => {
         try {
             const { ethereum } = window;
-
+            console.log("CONTRACT_ADDRESS",CONTRACT_ADDRESS)
             if (!ethereum) {
                 console.log("Make sure you have Metamask!");
                 return;
